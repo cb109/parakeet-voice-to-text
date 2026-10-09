@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Whistle</string>
+    <string name="share_label">Transcribe</string>
+    <string name="pick">Pick audio file</string>
+    <string name="record">Record</string>
+    <string name="stop">Stop</string>
+    <string name="recording">Recording…</string>
+    <string name="delete_all">Delete all</string>
+    <string name="confirm_delete_all">Delete all transcripts and their audio files?</string>
+    <string name="delete">Delete</string>
+    <string name="confirm_delete">Delete this transcript and its audio file?</string>
+    <string name="copy">Copy</string>
+    <string name="copied">Copied</string>
+    <string name="no_transcript">(no transcript)</string>
+    <string name="empty_transcript">(nothing recognised)</string>
+    <string name="mic_denied">Microphone permission denied</string>
+    <string name="saved_in">Files are saved in %1$s</string>
+</resources>
