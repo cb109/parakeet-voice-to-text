@@ -17,4 +17,4 @@ fi
 
 ./build.sh
 adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb shell am start -n com.example.whistle/.MainActivity
+adb shell am start -n com.example.parakeet/.MainActivity

@@ -1,4 +1,4 @@
-package com.example.whistle
+package com.example.parakeet
 
 import android.annotation.SuppressLint
 import android.media.AudioFormat
@@ -81,7 +81,7 @@ class Recorder(val file: File) {
         }.array()
 
     private companion object {
-        const val RATE = Whistle.SAMPLE_RATE
+        const val RATE = Parakeet.SAMPLE_RATE
         const val HEADER_SIZE = 44
     }
 }

@@ -1,4 +1,4 @@
-package com.example.whistle
+package com.example.parakeet
 
 import android.content.Context
 import android.net.Uri
@@ -8,8 +8,10 @@ import android.os.SystemClock
 import java.io.File
 import java.util.concurrent.Executors
 
-/** Background queue: import -> decode -> split into <=30 s parts -> Whistle -> join -> .txt */
+/** Background queue: import -> decode -> split into <=30 s parts -> Parakeet -> join -> .txt */
 object Transcriber {
+    private const val MAX_PART = 30 * Parakeet.SAMPLE_RATE
+
     sealed interface Event {
         data object Progress : Event
         data class Done(val audio: File) : Event
@@ -49,16 +51,16 @@ object Transcriber {
     }
 
     private fun run(context: Context, audio: File) {
-        val startedAt = SystemClock.elapsedRealtime()
         try {
-            progress("Loading model…")
-            Whistle.load(context)
+            progress("Preparing model…")
+            Parakeet.load(context, ::progress)
+            val startedAt = SystemClock.elapsedRealtime()
             progress("Decoding ${audio.name}…")
             val pcm = AudioDecoder.decode(audio)
             val parts = split(pcm)
             val texts = parts.mapIndexed { i, range ->
                 progress("Transcribing ${audio.name}: part ${i + 1}/${parts.size}")
-                Whistle.transcribe(pcm, range.first, range.last - range.first + 1)
+                Parakeet.transcribe(pcm, range.first, range.last + 1)
             }
             if (!audio.exists()) {
                 val message = "${audio.name} was deleted during transcription"
@@ -69,7 +71,7 @@ object Transcriber {
             finished(
                 Event.Done(audio),
                 "Transcribed %s (%.0f s audio) in %.1f s".format(
-                    audio.name, pcm.size.toDouble() / Whistle.SAMPLE_RATE, seconds,
+                    audio.name, pcm.size.toDouble() / Parakeet.SAMPLE_RATE, seconds,
                 ),
             )
         } catch (e: Throwable) {
@@ -78,12 +80,12 @@ object Transcriber {
         }
     }
 
-    /** Cuts before the 30 s limit at the quietest 300 ms between 20 s and 30 s, so words are not split. */
+    /** Bounded parts keep encoder memory in check; cuts at the quietest 300 ms between 20 s and 30 s so words are not split. */
     private fun split(pcm: FloatArray): List<IntRange> {
         val parts = mutableListOf<IntRange>()
         var start = 0
-        while (pcm.size - start > Whistle.MAX_SAMPLES) {
-            val cut = quietestPoint(pcm, start + 20 * Whistle.SAMPLE_RATE, start + Whistle.MAX_SAMPLES)
+        while (pcm.size - start > MAX_PART) {
+            val cut = quietestPoint(pcm, start + 20 * Parakeet.SAMPLE_RATE, start + MAX_PART)
             parts += start until cut
             start = cut
         }
@@ -92,7 +94,7 @@ object Transcriber {
     }
 
     private fun quietestPoint(pcm: FloatArray, from: Int, to: Int): Int {
-        val frame = Whistle.SAMPLE_RATE / 50 // 20 ms
+        val frame = Parakeet.SAMPLE_RATE / 50 // 20 ms
         val window = 15 // frames = 300 ms
         val energy = DoubleArray((to - from) / frame) { i ->
             var e = 0.0
@@ -118,9 +120,11 @@ object Transcriber {
         listener?.invoke(Event.Progress)
     }
 
-    private fun progress(message: String) = main.post {
-        status = message
-        listener?.invoke(Event.Progress)
+    private fun progress(message: String) {
+        main.post {
+            status = message
+            listener?.invoke(Event.Progress)
+        }
     }
 
     private fun finished(event: Event, message: String) {

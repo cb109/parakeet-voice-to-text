@@ -1,4 +1,4 @@
-package com.example.whistle
+package com.example.parakeet
 
 import android.media.AudioFormat
 import android.media.MediaCodec
@@ -98,7 +98,7 @@ object AudioDecoder {
                 }
                 codec.releaseOutputBuffer(index, false)
 
-                val r = resampler ?: Resampler(rate, Whistle.SAMPLE_RATE).also { resampler = it }
+                val r = resampler ?: Resampler(rate, Parakeet.SAMPLE_RATE).also { resampler = it }
                 r.push(mono, frames)
                 if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) return r.finish()
             }

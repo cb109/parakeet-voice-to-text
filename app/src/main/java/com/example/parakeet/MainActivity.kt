@@ -1,4 +1,4 @@
-package com.example.whistle
+package com.example.parakeet
 
 import android.Manifest
 import android.app.Activity

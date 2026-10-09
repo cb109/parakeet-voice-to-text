@@ -5,7 +5,3 @@ build/
 local.properties
 *.iml
 app/.cxx/
-
-# Downloaded by the fetchWhistle Gradle task
-app/src/main/cpp/needle/
-app/src/main/assets/whistle.cact

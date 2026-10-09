@@ -1,4 +1,4 @@
-package com.example.whistle
+package com.example.parakeet
 
 import android.content.Context
 import android.net.Uri
@@ -11,12 +11,12 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Everything lives in Download/Whistle: `<stamp>_<name>.<ext>` is the audio,
+ * Everything lives in Download/Parakeet: `<stamp>_<name>.<ext>` is the audio,
  * `<stamp>_<name>.txt` next to it is the transcript.
  */
 object Storage {
     val dir: File
-        get() = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Whistle")
+        get() = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Parakeet")
             .also { it.mkdirs() }
 
     class Entry(val audio: File) {
